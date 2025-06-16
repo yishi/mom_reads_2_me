@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图像文本识别与翻译</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- 添加空的favicon引用 -->
+    <link rel="icon" href="data:,">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>图像文本识别与翻译</h1>
+            <p>上传图片 → OCR识别英文 → 翻译成中文 → 语音合成</p>
+        </header>
+        
+        <main>
+            <section class="upload-section">
+                <h2>上传图片</h2>
+                <div class="upload-area" id="dropArea">
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+                    <div class="upload-placeholder" id="uploadPlaceholder">
+                        <img src="{{ url_for('static', filename='img/upload.svg') }}" alt="上传图标" id="uploadIcon">
+                        <p>点击或拖拽图片到此处</p>
+                    </div>
+                    <div class="image-preview" id="imagePreview" hidden>
+                        <img src="" alt="预览图" id="previewImg">
+                        <button class="remove-btn" id="removeBtn">移除</button>
+                    </div>
+                </div>
+                <button class="process-btn" id="processBtn" disabled>开始OCR识别</button>
+                
+                <!-- 流程图部分 -->
+                <div class="process-flow" id="processFlow" hidden>
+                    <div class="flow-steps">
+                        <div class="flow-step completed" id="uploadStep">
+                            <div class="step-icon">1</div>
+                            <div class="step-text">上传图片</div>
+                        </div>
+                        <div class="flow-connector" id="connector1"></div>
+                        <div class="flow-step" id="ocrFlowStep">
+                            <div class="step-icon">2</div>
+                            <div class="step-text">OCR识别</div>
+                        </div>
+                        <div class="flow-connector" id="connector2"></div>
+                        <div class="flow-step" id="translateFlowStep">
+                            <div class="step-icon">3</div>
+                            <div class="step-text">翻译</div>
+                        </div>
+                        <div class="flow-connector" id="connector3"></div>
+                        <div class="flow-step" id="audioFlowStep">
+                            <div class="step-icon">4</div>
+                            <div class="step-text">语音合成</div>
+                        </div>
+                    </div>
+                    <button class="details-btn" id="toggleDetailsBtn">查看详情</button>
+                </div>
+            </section>
+
+            <section class="result-section" id="resultSection" hidden>
+                <div class="details-container" id="detailsContainer" hidden>
+                    <div class="step-container" id="ocrStep">
+                        <h3>步骤1: OCR识别结果</h3>
+                        <div class="text-box">
+                            <textarea id="ocrResult" placeholder="识别的英文文本将显示在这里..." readonly></textarea>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="edit-btn" id="editOcrBtn">编辑</button>
+                            <button class="download-btn" id="downloadOcrBtn">确认并下载英文文本</button>
+                            <button class="confirm-btn" id="confirmOcrBtn">确认并翻译</button>
+                        </div>
+                    </div>
+                    
+                    <div class="step-container" id="translateStep" hidden>
+                        <h3>步骤2: 翻译结果</h3>
+                        <div class="text-box">
+                            <label for="promptInput">翻译提示词：</label>
+                            <textarea id="promptInput" placeholder="自定义翻译风格的提示词..." rows="3">你是一个专业的英译中翻译助手，请将用户提供的英文文本翻译成儿童科普漫画风格的中文。只返回翻译结果，不要添加任何解释或原文。</textarea>
+                            <div class="prompt-buttons">
+                                <button class="edit-btn" id="editPromptBtn">编辑</button>
+                                <button class="confirm-btn" id="retranslateBtn">确认并重新翻译</button>
+                            </div>
+                        </div>
+                        <div class="text-box">
+                            <textarea id="translationResult" placeholder="翻译的中文文本将显示在这里..." readonly></textarea>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="edit-btn" id="editTranslateBtn">编辑</button>
+                            <button class="download-btn" id="downloadTranslateBtn">确认并下载中文文本</button>
+                            <button class="confirm-btn" id="confirmTranslateBtn">确认并生成语音</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step-container" id="audioStep">
+                    <h3>步骤3: 语音合成</h3>
+                    
+                    <!-- 添加用户语音上传部分 -->
+                    <div class="voice-upload-container">
+                        <h4>上传参考语音（可选）</h4>
+                        <div class="voice-upload-area">
+                            <input type="file" id="voiceInput" accept="audio/mp3,audio/wav,audio/pcm,audio/opus" hidden>
+                            <button class="upload-voice-btn" id="uploadVoiceBtn">上传语音</button>
+                            <span id="voiceFileName">未选择文件</span>
+                            <button class="remove-voice-btn" id="removeVoiceBtn" hidden>移除</button>
+                        </div>
+                        <div class="voice-preview" id="voicePreview" hidden>
+                            <audio controls id="voicePreviewAudio" class="audio-player"></audio>
+                        </div>
+                        <div class="voice-quality-guide">
+                            <h5>音频质量指南：</h5>
+                            <ul>
+                                <li>仅限单一说话人</li>
+                                <li>吐字清晰、稳定的音量、音调和情绪</li>
+                                <li>简短的停顿（建议0.5秒）</li>
+                                <li>理想情况：无背景噪音、专业录音质量、无房间回声</li>
+                                <li>建议时间8～10s左右</li>
+                                <li>支持格式：mp3, wav, pcm, opus</li>
+                            </ul>
+                        </div>
+                        <div class="voice-text-container">
+                            <textarea id="voiceText" placeholder="请输入参考语音的文字内容..." rows="3"></textarea>
+                            <button class="confirm-btn" id="regenerateAudioBtn">确认并重新生成语音</button>
+                        </div>
+                    </div>
+                    
+                    <div class="audio-container">
+                        <div class="audio-item">
+                            <h4>英文语音</h4>
+                            <audio controls id="englishAudio" class="audio-player"></audio>
+                            <a class="download-btn" id="downloadEnBtn" download="english_audio.mp3">下载英文音频</a>
+                        </div>
+                        <div class="audio-item">
+                            <h4>中文语音</h4>
+                            <audio controls id="chineseAudio" class="audio-player"></audio>
+                            <a class="download-btn" id="downloadZhBtn" download="chinese_audio.mp3">下载中文音频</a>
+                        </div>
+                    </div>
+                    <div class="reset-container">
+                        <button class="reset-btn" id="resetAllBtn">一键清空，重新开始上传图片</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <div class="loading-overlay" id="loadingOverlay" hidden>
+            <div class="spinner"></div>
+            <p id="loadingText">正在处理中...</p>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
