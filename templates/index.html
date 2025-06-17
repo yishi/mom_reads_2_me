@@ -11,8 +11,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>图像文本识别与翻译</h1>
-            <p>上传图片 → OCR识别英文 → 翻译成中文 → 语音合成</p>
+            <h1>爸爸妈妈读书给我听</h1>
+            <p>上传图片（书本内页） → OCR识别英文 → 翻译成中文 → 合成中英文语音</p>
         </header>
         
         <main>
@@ -29,7 +29,39 @@
                         <button class="remove-btn" id="removeBtn">移除</button>
                     </div>
                 </div>
-                <button class="process-btn" id="processBtn" disabled>开始OCR识别</button>
+                
+                <!-- 移动参考语音上传部分到这里 -->
+                <div class="voice-upload-container">
+                    <h4>上传爸爸或者妈妈语音（可选，如果暂时没有语音上传，会使用系统自带语音进行合成）</h4>
+                    <details class="voice-quality-guide-details">
+                        <summary>音频质量指南</summary>
+                        <div class="voice-quality-guide">
+                            <ul>
+                                <li>仅限单一说话人</li>
+                                <li>吐字清晰、稳定的音量、音调和情绪</li>
+                                <li>简短的停顿（建议0.5秒）</li>
+                                <li>理想情况：无背景噪音、专业录音质量、无房间回声</li>
+                                <li>建议时间8～10s左右</li>
+                                <li>支持格式：mp3, wav, pcm, opus</li>
+                            </ul>
+                        </div>
+                    </details>
+                    <div class="voice-upload-area">
+                        <input type="file" id="voiceInput" accept="audio/mp3,audio/wav,audio/pcm,audio/opus" hidden>
+                        <button class="upload-voice-btn" id="uploadVoiceBtn">上传语音</button>
+                        <span id="voiceFileName">未选择文件</span>
+                        <button class="remove-voice-btn" id="removeVoiceBtn" hidden>移除</button>
+                    </div>
+                    <div class="voice-preview" id="voicePreview" hidden>
+                        <audio controls id="voicePreviewAudio" class="audio-player"></audio>
+                    </div>
+                    <div class="voice-text-container">
+                        <textarea id="voiceText" placeholder="请输入爸爸或者妈妈语音对应的文字内容..." rows="3"></textarea>
+                        <!-- <button class="confirm-btn" id="regenerateAudioBtn">确认并重新生成语音</button> -->
+                    </div>
+                </div>
+                
+                <button class="process-btn" id="processBtn" disabled>开始</button>
                 
                 <!-- 流程图部分 -->
                 <div class="process-flow" id="processFlow" hidden>
@@ -76,7 +108,7 @@
                         <h3>步骤2: 翻译结果</h3>
                         <div class="text-box">
                             <label for="promptInput">翻译提示词：</label>
-                            <textarea id="promptInput" placeholder="自定义翻译风格的提示词..." rows="3">你是一个专业的英译中翻译助手，请将用户提供的英文文本翻译成儿童科普漫画风格的中文。只返回翻译结果，不要添加任何解释或原文。</textarea>
+                            <textarea id="promptInput" placeholder="自定义翻译风格的提示词..." rows="3">翻译成儿童科普漫画风格的中文。只返回翻译结果，不要添加任何解释或原文。</textarea>
                             <div class="prompt-buttons">
                                 <button class="edit-btn" id="editPromptBtn">编辑</button>
                                 <button class="confirm-btn" id="retranslateBtn">确认并重新翻译</button>
@@ -95,35 +127,6 @@
                 
                 <div class="step-container" id="audioStep">
                     <h3>步骤3: 语音合成</h3>
-                    
-                    <!-- 添加用户语音上传部分 -->
-                    <div class="voice-upload-container">
-                        <h4>上传参考语音（可选）</h4>
-                        <div class="voice-upload-area">
-                            <input type="file" id="voiceInput" accept="audio/mp3,audio/wav,audio/pcm,audio/opus" hidden>
-                            <button class="upload-voice-btn" id="uploadVoiceBtn">上传语音</button>
-                            <span id="voiceFileName">未选择文件</span>
-                            <button class="remove-voice-btn" id="removeVoiceBtn" hidden>移除</button>
-                        </div>
-                        <div class="voice-preview" id="voicePreview" hidden>
-                            <audio controls id="voicePreviewAudio" class="audio-player"></audio>
-                        </div>
-                        <div class="voice-quality-guide">
-                            <h5>音频质量指南：</h5>
-                            <ul>
-                                <li>仅限单一说话人</li>
-                                <li>吐字清晰、稳定的音量、音调和情绪</li>
-                                <li>简短的停顿（建议0.5秒）</li>
-                                <li>理想情况：无背景噪音、专业录音质量、无房间回声</li>
-                                <li>建议时间8～10s左右</li>
-                                <li>支持格式：mp3, wav, pcm, opus</li>
-                            </ul>
-                        </div>
-                        <div class="voice-text-container">
-                            <textarea id="voiceText" placeholder="请输入参考语音的文字内容..." rows="3"></textarea>
-                            <button class="confirm-btn" id="regenerateAudioBtn">确认并重新生成语音</button>
-                        </div>
-                    </div>
                     
                     <div class="audio-container">
                         <div class="audio-item">

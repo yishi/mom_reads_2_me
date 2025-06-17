@@ -28,6 +28,8 @@ os.makedirs(AUDIO_FOLDER, exist_ok=True)
 OCR_API_URL = "https://api.ap.siliconflow.com/v1/chat/completions"  # 请替换为实际的OCR API端点
 TRANSLATE_API_URL = "https://api.ap.siliconflow.com/v1/chat/completions"  # 请替换为实际的翻译API端点
 TTS_API_URL = "https://api.ap.siliconflow.com/v1/audio/speech"  # 请替换为实际的TTS API端点
+UPLOAD_VOICE_API_URL = "https://api.ap.siliconflow.com/v1/uploads/audio/voice"
+
 
 @app.route('/')
 def index():
@@ -100,7 +102,7 @@ def translate():
     
     text = data['text']
     # 获取自定义提示词，如果没有则使用默认值
-    prompt = data.get('prompt', "你是一个专业的英译中翻译助手，请将用户提供的英文文本翻译成儿童科普漫画风格的中文。只返回翻译结果，不要添加任何解释或原文。")
+    prompt = data.get('prompt', "翻译成儿童科普漫画风格的中文。只返回翻译结果，不要添加任何解释或原文。")
     
     # 调用SiliconFlow翻译API
     headers = {
@@ -143,6 +145,9 @@ def tts():
     text = data['text']
     lang = data['lang']
     
+    # 获取原始文件名，如果没有提供则使用UUID
+    original_filename = data.get('original_filename', str(uuid.uuid4()))
+    
     # 检查是否有用户上传的语音URI
     if 'voice_uri' in data and data['voice_uri']:
         voice = data['voice_uri']
@@ -174,8 +179,9 @@ def tts():
         # 检查响应类型
         content_type = response.headers.get('Content-Type', '')
         
-        # 保存音频文件
-        filename = f"{lang}_{uuid.uuid4()}.mp3"
+        # 根据语言设置文件名
+        lang_text = "英文" if lang == 'en' else "中文"
+        filename = f"{original_filename}_{lang_text}.mp3"
         filepath = os.path.join(AUDIO_FOLDER, filename)
         
         if 'application/json' in content_type:
@@ -250,7 +256,7 @@ def upload_voice():
         
         # 发送请求到SiliconFlow上传语音API
         response = requests.post(
-            "https://api.ap.siliconflow.com/v1/uploads/audio/voice",
+            UPLOAD_VOICE_API_URL,
             headers=headers,
             files=files,
             data=data

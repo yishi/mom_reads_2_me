@@ -744,3 +744,25 @@ textarea:not([readonly]) {
     border-radius: 4px;
     resize: vertical;
 }
+/* 添加到文件末尾 */
+.voice-quality-guide-details {
+    margin: 15px 0;
+    background-color: #f0f8ff;
+    border-left: 4px solid #3498db;
+    border-radius: 4px;
+    padding: 5px 10px;
+}
+
+.voice-quality-guide-details summary {
+    cursor: pointer;
+    font-weight: bold;
+    color: #2c3e50;
+    padding: 5px 0;
+}
+
+.voice-quality-guide-details .voice-quality-guide {
+    margin: 10px 0;
+    padding: 0;
+    background-color: transparent;
+    border-left: none;
+}

@@ -625,7 +625,11 @@ document.addEventListener('DOMContentLoaded', function() {
     async function generateAudio(lang, text) {
         try {
             // 准备请求数据
-            let requestData = { text, lang };
+            let requestData = { 
+                text, 
+                lang,
+                original_filename: originalFileName // 添加原始文件名
+            };
             
             // 如果有用户上传的语音，添加到请求中
             if (userVoiceFile && voiceText.value.trim()) {
